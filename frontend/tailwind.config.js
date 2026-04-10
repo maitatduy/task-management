@@ -7,13 +7,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#1d4ed8",
-        secondary: "#64748b",
-        background: "#f8fafc"
+        primary: "#6366f1",
+        secondary: "#8b5cf6",
+        background: "#020617",
       },
       fontFamily: {
         sans: ['"Be Vietnam Pro"', "sans-serif"],
-      }
+      },
+      animation: {
+        "fade-in": "fadeIn 0.3s ease forwards",
+        "slide-in-left": "slideInLeft 0.3s ease forwards",
+        "scale-in": "scaleIn 0.2s ease forwards",
+      },
     },
   },
   plugins: [],

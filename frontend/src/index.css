@@ -1,11 +1,88 @@
-@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-primary: 99 102 241;
+    --color-secondary: 139 92 246;
+  }
+
+  * {
+    @apply box-border;
+  }
+
   body {
-    @apply bg-background text-slate-800 antialiased;
+    @apply bg-slate-950 text-slate-100 antialiased font-sans;
+    background-image: radial-gradient(ellipse 80% 80% at 50% -20%, rgba(99, 102, 241, 0.2), transparent);
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-600 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-500;
   }
 }
+
+@layer components {
+  /* Glass Card */
+  .glass-card {
+    @apply bg-slate-800/50 border border-slate-700/50 rounded-2xl backdrop-blur-sm;
+  }
+
+  /* Input base */
+  .input-base {
+    @apply w-full px-4 py-2.5 bg-slate-900/70 border border-slate-700 rounded-xl text-slate-100
+           placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20
+           transition-all duration-200;
+  }
+
+  /* Button base */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5
+           bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold rounded-xl
+           hover:from-indigo-500 hover:to-violet-500 active:scale-95 transition-all duration-200
+           disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100 shadow-lg shadow-indigo-500/20;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2
+           text-slate-400 font-medium rounded-xl
+           hover:bg-slate-700/60 hover:text-slate-100 active:scale-95 transition-all duration-200;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2
+           bg-rose-600/20 text-rose-400 font-medium rounded-xl border border-rose-500/30
+           hover:bg-rose-600/40 hover:text-rose-300 active:scale-95 transition-all duration-200;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in { animation: fadeIn 0.3s ease forwards; }
+.animate-slide-in-left { animation: slideInLeft 0.3s ease forwards; }
+.animate-scale-in { animation: scaleIn 0.2s ease forwards; }
