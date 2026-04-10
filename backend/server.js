@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import boardRoutes from "./routes/boardRoutes.js";
+import taskRoutes from "./routes/taskRoutes.js";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/boards", boardRoutes);
+app.use("/api/tasks", taskRoutes);
 app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "ok", message: "Server is running!" });
 });
