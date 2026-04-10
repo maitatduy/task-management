@@ -10,6 +10,9 @@ export default {
         primary: "#1d4ed8",
         secondary: "#64748b",
         background: "#f8fafc"
+      },
+      fontFamily: {
+        sans: ['"Be Vietnam Pro"', "sans-serif"],
       }
     },
   },
