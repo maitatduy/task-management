@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import Board from "../models/Board.js";
+import Task from "../models/Task.js";
 
 // @desc    Get all boards for user
 // @route   GET /api/boards
@@ -20,10 +21,9 @@ export const getBoardById = asyncHandler(async (req, res) => {
     throw new Error("Board not found");
   }
 
-  // Check for user
   if (board.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error("User not authorized");
+    res.status(403);
+    throw new Error("Not authorized to access this board");
   }
 
   res.status(200).json(board);
@@ -35,14 +35,19 @@ export const getBoardById = asyncHandler(async (req, res) => {
 export const createBoard = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
 
-  if (!name) {
+  if (!name || !name.trim()) {
     res.status(400);
     throw new Error("Please add a board name");
   }
 
+  if (name.trim().length > 100) {
+    res.status(400);
+    throw new Error("Board name cannot exceed 100 characters");
+  }
+
   const board = await Board.create({
-    name,
-    description,
+    name: name.trim(),
+    description: description?.trim(),
     user: req.user.id,
   });
 
@@ -60,22 +65,31 @@ export const updateBoard = asyncHandler(async (req, res) => {
     throw new Error("Board not found");
   }
 
-  // Check for user ownership
   if (board.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error("User not authorized");
+    res.status(403);
+    throw new Error("Not authorized to update this board");
+  }
+
+  const { name, description } = req.body;
+
+  if (name !== undefined && !name.trim()) {
+    res.status(400);
+    throw new Error("Board name cannot be empty");
   }
 
   const updatedBoard = await Board.findByIdAndUpdate(
     req.params.id,
-    req.body,
-    { new: true } // Create if doesn't exist
+    {
+      ...(name && { name: name.trim() }),
+      ...(description !== undefined && { description: description.trim() }),
+    },
+    { new: true, runValidators: true }
   );
 
   res.status(200).json(updatedBoard);
 });
 
-// @desc    Delete a board
+// @desc    Delete a board (cascade deletes all its tasks)
 // @route   DELETE /api/boards/:id
 // @access  Private
 export const deleteBoard = asyncHandler(async (req, res) => {
@@ -86,13 +100,15 @@ export const deleteBoard = asyncHandler(async (req, res) => {
     throw new Error("Board not found");
   }
 
-  // Check for user ownership
   if (board.user.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error("User not authorized");
+    res.status(403);
+    throw new Error("Not authorized to delete this board");
   }
+
+  // Cascade delete: remove all tasks belonging to this board
+  await Task.deleteMany({ board: board._id });
 
   await board.deleteOne();
 
-  res.status(200).json({ id: req.params.id });
+  res.status(200).json({ id: req.params.id, message: "Board and all its tasks deleted" });
 });

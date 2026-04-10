@@ -8,18 +8,24 @@ import generateToken from "../utils/generateToken.js";
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
-  const userExists = await User.findOne({ email });
-
-  if (userExists) {
+  // Validation
+  if (!name || !email || !password) {
     res.status(400);
-    throw new Error("User already exists");
+    throw new Error("Please provide name, email and password");
   }
 
-  const user = await User.create({
-    name,
-    email,
-    password,
-  });
+  if (password.length < 6) {
+    res.status(400);
+    throw new Error("Password must be at least 6 characters");
+  }
+
+  const userExists = await User.findOne({ email: email.toLowerCase() });
+  if (userExists) {
+    res.status(400);
+    throw new Error("User already exists with this email");
+  }
+
+  const user = await User.create({ name: name.trim(), email, password });
 
   if (user) {
     generateToken(res, user._id);
@@ -40,7 +46,12 @@ export const registerUser = asyncHandler(async (req, res) => {
 export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+  if (!email || !password) {
+    res.status(400);
+    throw new Error("Please provide email and password");
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() });
 
   if (user && (await user.matchPassword(password))) {
     generateToken(res, user._id);
@@ -55,6 +66,19 @@ export const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Get current logged-in user profile
+// @route   GET /api/auth/me
+// @access  Private
+export const getMe = asyncHandler(async (req, res) => {
+  // req.user is set by the protect middleware
+  const user = req.user;
+  res.status(200).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+  });
+});
+
 // @desc    Logout user / clear cookie
 // @route   POST /api/auth/logout
 // @access  Public
@@ -63,5 +87,5 @@ export const logoutUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     expires: new Date(0),
   });
-  res.status(200).json({ message: "User logged out" });
+  res.status(200).json({ message: "User logged out successfully" });
 });
